@@ -33,7 +33,7 @@ router.get("/", (req, res) => {
 });
 
 /**
- * @desc Get a single book
+ * @desc Get a single book by id 
  * @route /api/books/:id
  * @method GET
  * @access public
@@ -48,7 +48,7 @@ router.get("/:id", (req, res) => {
 });
 
 /**
- * @desc Create a book
+ * @desc Create a new book
  * @route /api/books
  * @method POST
  * @access public
