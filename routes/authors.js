@@ -1,6 +1,14 @@
 const express = require("express");
+// we are using asyncHandler middleware to catch and handle errors
+// without it, we should to write into async try and catch
+// but with it we can simply use asyncHandler and into async will use our functions without try/catch
+const asyncHandler = require("express-async-handler");
 const router = express.Router();
-const { Author, validateAddAuthor, validateUpdateAuthor } = require("../models/Author");
+const {
+  Author,
+  validateAddAuthor,
+  validateUpdateAuthor,
+} = require("../models/Author");
 
 /**
  * @desc Get all authors
@@ -9,19 +17,17 @@ const { Author, validateAddAuthor, validateUpdateAuthor } = require("../models/A
  * @access public
  */
 
-router.get("/", async (req, res) => {
-  try {
+router.get(
+  "/",
+  asyncHandler(async (req, res) => {
     const authorList = await Author.find();
     // If i want to return for frontend sorted arr, i have to add after .find().sort( forExapmple: { firstName: 1 });
     // and if sort( {firstName: -1 }); it well be reserved sroted arr
     // if i want to return for example just FirstName, lastNames and without id too
     // i can use .find().select("firstName lastName -_id");
     res.status(200).json(authorList);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-});
+  })
+);
 
 /**
  * @desc Get a single author by id
@@ -30,19 +36,17 @@ router.get("/", async (req, res) => {
  * @access public
  */
 
-router.get("/:id", async (req, res) => {
-  try {
+router.get(
+  "/:id",
+  asyncHandler(async (req, res) => {
     const author = await Author.findById(req.params.id);
     if (author) {
       res.status(200).json(author);
     } else {
       return res.status(404).json({ message: "Author is nod found" });
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-});
+  })
+);
 
 /**
  * @desc Create a new author
@@ -51,14 +55,15 @@ router.get("/:id", async (req, res) => {
  * @access public
  */
 
-router.post("/", async (req, res) => {
-  const { error } = validateAddAuthor(req.body);
+router.post(
+  "/",
+  asyncHandler(async (req, res) => {
+    const { error } = validateAddAuthor(req.body);
 
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
-  try {
     const author = new Author({
       firstName: req.body.firstName,
       lastName: req.body.lastName,
@@ -69,11 +74,8 @@ router.post("/", async (req, res) => {
     const result = await author.save();
 
     res.status(201).json(result);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Something went wrong" });
-  }
-});
+  })
+);
 
 /**
  * @desc Edit an author by id
@@ -82,13 +84,14 @@ router.post("/", async (req, res) => {
  * @access public
  */
 
-router.put("/:id", async (req, res) => {
-  const { error } = validateUpdateAuthor(req.body);
-  if (error) {
-    return res.status(400).json({ message: error.details[0].message });
-  }
+router.put(
+  "/:id",
+  asyncHandler(async (req, res) => {
+    const { error } = validateUpdateAuthor(req.body);
+    if (error) {
+      return res.status(400).json({ message: error.details[0].message });
+    }
 
-  try {
     const author = await Author.findByIdAndUpdate(
       req.params.id,
       {
@@ -104,11 +107,8 @@ router.put("/:id", async (req, res) => {
       { new: true }
     );
     res.status(200).json(author);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-});
+  })
+);
 
 /**
  * @desc Delete an author by id
@@ -117,8 +117,9 @@ router.put("/:id", async (req, res) => {
  * @access public
  */
 
-router.delete("/:id", async (req, res) => {
-  try {
+router.delete(
+  "/:id",
+  asyncHandler(async (req, res) => {
     const author = await Author.findById(req.params.id);
     if (author) {
       await Author.findByIdAndDelete(req.params.id);
@@ -126,11 +127,7 @@ router.delete("/:id", async (req, res) => {
     } else {
       res.status(404).json({ message: "Author not found" });
     }
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: "Server Error" });
-  }
-});
-
+  })
+);
 
 module.exports = router;
