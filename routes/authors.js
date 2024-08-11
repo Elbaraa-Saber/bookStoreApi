@@ -9,6 +9,7 @@ const {
   validateAddAuthor,
   validateUpdateAuthor,
 } = require("../models/Author");
+const { verifyTokenAndAdmin } = require("../middlewares/verifyToken");
 
 /**
  * @desc Get all authors
@@ -52,11 +53,12 @@ router.get(
  * @desc Create a new author
  * @route /api/authors
  * @method POST
- * @access public
+ * @access private (admin) protected route
  */
 
 router.post(
   "/",
+  verifyTokenAndAdmin,
   asyncHandler(async (req, res) => {
     const { error } = validateAddAuthor(req.body);
 
@@ -81,11 +83,12 @@ router.post(
  * @desc Edit an author by id
  * @route /api/authors/:id
  * @method PUT
- * @access public
+ * @access private (admin) protected route
  */
 
 router.put(
   "/:id",
+  verifyTokenAndAdmin,
   asyncHandler(async (req, res) => {
     const { error } = validateUpdateAuthor(req.body);
     if (error) {
@@ -114,11 +117,12 @@ router.put(
  * @desc Delete an author by id
  * @route /api/authors/:id
  * @method DELETE
- * @access public
+ * @access private (admin) protected route
  */
 
 router.delete(
   "/:id",
+  verifyTokenAndAdmin,
   asyncHandler(async (req, res) => {
     const author = await Author.findById(req.params.id);
     if (author) {
